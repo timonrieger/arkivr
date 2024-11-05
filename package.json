@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "gunicorn app:app",
+    "build": "tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css",
+    "dev": "tailwindcss -i ./static/src/input.css -o ./static/dist/css/output.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.14"
+  },
+  "dependencies": {
+    "flowbite": "^2.5.2"
+  }
+}
