@@ -44,6 +44,7 @@
       <h2 class="text-sm text-gray-500">Description</h2>
       <p class="text-medium text-md break-words">{{ ressource.description }}</p>
     </div>
+    {% if current_user.id == ressource.user_id or current_user.id == 14 %}
     <div class="flex justify-end gap-4">
       <div>
         <h2 class="text-sm text-gray-500">Edit</h2>
@@ -68,6 +69,7 @@
         </a>
       </div>
     </div>
+    {% endif %}
   </div>
 </div>
 
