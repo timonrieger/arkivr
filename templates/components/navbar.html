@@ -1,17 +1,26 @@
 <nav
-  class="shadow-sm border m-4 border-gray-200 px-2 sm:px-4 py-2.5 rounded-lg"
+  class="sticky-top bg-white shadow-sm border m-4 border-gray-200 px-2 sm:px-4 py-2.5 rounded-lg"
 >
   <div
     class="container flex flex-wrap justify-between items-center mx-auto my-3"
   >
-    <a href="{{ url_for('home') }}" class="flex items-center">
-      <img
-        class="hover-grow rounded me-2"
-        src="../static/logo.svg"
-        alt="Logo"
-        width="50rem"
-      />
-    </a>
+    <div class="flex flex-col gap-2">
+      <div class="flex items-center">
+              <a href="{{ url_for('home') }}" class="flex items-center">
+          <img
+            class="hover-grow rounded me-2"
+            src="../static/logo.svg"
+            alt="Logo"
+            width="50rem"
+          />
+        </a>
+        <span class="text-2xl font-bold text-blue-700 dark:text-blue-300">
+          Public Library
+        </span>
+      </div>
+      <span class="text-sm text-blue-700 dark:text-blue-300"><em>Saving stuff for future reference</em></span>
+    </div>
+
     <div class="flex md:order-2 gap-2">
       {% if current_user.is_authenticated %}
       <a href="{{ url_for('add') }}">

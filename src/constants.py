@@ -2,6 +2,8 @@ import requests
 import dotenv
 import os
 
+dotenv.load_dotenv()
+
 NPOINT = os.getenv("NPOINT")
 npoint_data = requests.get(url=NPOINT).json()
 
