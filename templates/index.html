@@ -1,13 +1,13 @@
-{% extends "components/layout.html" %}
-
-{% block title %}
-
-{% endblock %}
-
-{% block description %}
-
-{% endblock %}
-
-{% block content %}
-    <p class="text-gray-500">Hello World!</p>
+{% extends "layout.html" %} {% block content %}
+  {% include 'components/search.html' %}
+  <p>{{ ressources|length }} {%if ressources|length == 1 %}result{% else %}results{% endif %}
+    {% if search_query %}
+      for "{{ search_query }}"
+    {% endif %}
+  </p>
+  {% for ressource in ressources %}
+    <div class="border border-gray-500 px-4 rounded-md mb-3">
+      {% include 'components/ressource.html' %}
+    </div>
+  {% endfor %}  
 {% endblock %}

@@ -1,0 +1,1 @@
+ADMINS = ["timon@riegerx.de"]

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static',filename='dist/css/output.css')}}"
+    />
+    {{ bootstrap.load_css() }}
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{ url_for('static', filename='logo.svg') }}"
+    />
+    <title>Ressource Library</title>
+  </head>
+  <body class="bg-white dark:bg-gray-800">
+    {% include 'components/navbar.html' %}
+    <main class="w-full">
+      <div class="shadow-sm border m-4 border-gray-200 px-2 sm:px-4 py-2.5 rounded-lg">
+        <div
+          class="container items-center mx-auto mb-5 mt-2"
+        >
+          {% for category, message in get_flashed_messages(with_categories=true)
+          %} {% if category == 'success' %}
+          <div class="alert alert-success flash" role="alert">
+            <h5 class="pt-2">{{ message }}</h5>
+          </div>
+          {% elif category == 'error' %}
+          <div class="alert alert-danger flash" role="alert">
+            <h5 class="pt-2">{{ message }}</h5>
+          </div>
+          {% endif %} {% endfor %} {% block content %} {% endblock %}
+        </div>
+      </div>
+    </main>
+    {% include 'components/footer.html' %}
+    <script src="https://unpkg.com/flowbite@2.0.0/dist/flowbite.js"></script>
+  </body>
+</html>

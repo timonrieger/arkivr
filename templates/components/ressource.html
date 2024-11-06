@@ -1,0 +1,113 @@
+<div class="hidden md:flex py-4 relative flex-col">
+  <div class="mb-2 flex flex-row justify-between">
+    <div>
+      <h2 class="text-sm text-gray-500">Name</h2>
+      <p class="text-medium text-md truncate">{{ ressource.name | title }}</p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Link</h2>
+      <p class="text-medium text-md truncate">
+        <a href="{{ ressource.link }}" target="_blank">Open</a>
+      </p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Medium</h2>
+      <p class="text-medium text-md truncate">{{ ressource.medium }}</p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Category</h2>
+      <p class="text-medium text-md truncate">{{ ressource.category }}</p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Topic</h2>
+      <p class="text-medium text-md truncate">{{ ressource.topic }}</p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Tags</h2>
+      <p class="text-medium text-md truncate">
+        {% if ressource.tags=='[]' %} No tags {% else %} {{ ressource.tags |
+        replace('"', '') | replace('[', '') | replace(']', '') }} {% endif %}
+      </p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Added</h2>
+      {% set date = ressource.added.strftime('%d-%m-%y') %}
+      <p class="text-medium text-md truncate">{{ date }}</p>
+    </div>
+    <div>
+      <h2 class="text-sm text-gray-500">Issuer</h2>
+      <p class="text-medium text-md truncate">{{ ressource.username }}</p>
+    </div>
+  </div>
+  <div class="mb-2 flex flex-row justify-between flex-wrap">
+    <div class="flex-1">
+      <h2 class="text-sm text-gray-500">Description</h2>
+      <p class="text-medium text-md break-words">{{ ressource.description }}</p>
+    </div>
+    <div class="flex justify-end gap-4">
+      <div>
+        <h2 class="text-sm text-gray-500">Edit</h2>
+        <a href="{{ url_for('edit', id=ressource.id) }}">
+          <button
+            type="button"
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-3 py-2.5 text-center md:mr-0 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Edit
+          </button>
+        </a>
+      </div>
+      <div>
+        <h2 class="text-sm text-gray-500">Delete</h2>
+        <a href="{{ url_for('delete', id=ressource.id) }}">
+          <button
+            type="button"
+            class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-2.5 text-center md:mr-0 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
+          >
+            Delete
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flex md:hidden flex-col py-4">
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Name</h2>
+    <p class="text-medium text-md truncate">{{ ressource.name }}</p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Link</h2>
+    <p class="text-medium text-md truncate">
+      <a href="{{ ressource.link }}" target="_blank">Open</a>
+    </p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Medium</h2>
+    <p class="text-medium text-md truncate">{{ ressource.medium }}</p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Category</h2>
+    <p class="text-medium text-md truncate">{{ ressource.category }}</p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Topic</h2>
+    <p class="text-medium text-md truncate">{{ ressource.topic }}</p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Tags</h2>
+    <p class="text-medium text-md truncate">
+      {% if ressource.tags=='[]' %} No tags {% else %} {{ ressource.tags |
+      replace('"', '') | replace('[', '') | replace(']', '') }} {% endif %}
+    </p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Added</h2>
+    {% set date = ressource.added.strftime('%d-%m-%y') %}
+    <p class="text-medium text-md truncate">{{ date }}</p>
+  </div>
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Issuer</h2>
+    <p class="text-medium text-md truncate">{{ ressource.username }}</p>
+  </div>
+</div>
