@@ -5,8 +5,7 @@ from database import db, create_all, User as UserModel, Ressources
 from dotenv import load_dotenv
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from sqlalchemy import or_
-from src.admins import ADMINS
-from src.forms import RessourceForm, LoginForm, RegistrationForm
+from src.constants import ADMINS
 from flask_bootstrap import Bootstrap5
 import json
 

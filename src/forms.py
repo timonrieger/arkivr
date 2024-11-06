@@ -1,40 +1,33 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, SelectMultipleField
 from wtforms.validators import DataRequired, URL, Length, Optional
-import requests
-
-NPOINT = "https://api.npoint.io/1ba4f8744068b81b8070"
-medium_choices = requests.get(url=NPOINT).json()["medium"]
-category_choices = requests.get(url=NPOINT).json()["category"]
-topic_choices = requests.get(url=NPOINT).json()["topic"]
-tags_choices = requests.get(url=NPOINT).json()["tags"]
-
+from constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TOPIC_CHOICES, TAGS_CHOICES
 
 class RessourceForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired(), Length(max=10)])
+    name = StringField("Name", validators=[DataRequired(), Length(max=20)])
     link = StringField("Link", validators=[DataRequired(), URL()])
     description = StringField("Description", validators=[Optional()])
     medium = SelectField(
         "Medium", 
-        choices=medium_choices,
+        choices=MEDIUM_CHOICES,
         validators=[DataRequired()]
     )
 
     category = SelectField(
         "Category", 
-        choices=category_choices,
+        choices=CATEGORY_CHOICES,
         validators=[DataRequired()]
     )
 
     topic = SelectField(
         "Topic", 
-        choices=topic_choices,
+        choices=TOPIC_CHOICES,
         validators=[DataRequired()]
     )
 
     tags = SelectMultipleField(
         "Tags", 
-        choices=tags_choices,
+        choices=TAGS_CHOICES,
         validators=[Optional()]
     )
     submit = SubmitField(label="Save")
