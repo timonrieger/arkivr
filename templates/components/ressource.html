@@ -2,7 +2,7 @@
   <div class="mb-2 flex flex-row justify-between">
     <div>
       <h2 class="text-sm text-gray-500">Name</h2>
-      <p class="text-medium text-md truncate">{{ ressource.name | title }}</p>
+      <p class="text-medium text-md truncate">{{ ressource.name }}</p>
     </div>
     <div>
       <h2 class="text-sm text-gray-500">Link</h2>
@@ -38,6 +38,12 @@
       <h2 class="text-sm text-gray-500">Issuer</h2>
       <p class="text-medium text-md truncate">{{ ressource.username }}</p>
     </div>
+    {% if current_user.is_authenticated %}
+    <div>
+      <h2 class="text-sm text-gray-500">Private</h2>
+      <p class="text-medium text-md break-words">{{ ressource.private }}</p>
+    </div>
+    {% endif %}
   </div>
   <div class="mb-2 flex flex-row justify-between flex-wrap">
     <div class="flex-1">
@@ -112,4 +118,10 @@
     <h2 class="text-sm text-gray-500">Issuer</h2>
     <p class="text-medium text-md truncate">{{ ressource.username }}</p>
   </div>
+  {% if current_user.is_authenticated %}
+  <div class="flex flex-row justify-between items-center">
+    <h2 class="text-sm text-gray-500">Private</h2>
+    <p class="text-medium text-md break-words">{{ ressource.private }}</p>
+  </div>
+  {% endif %}
 </div>

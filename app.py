@@ -5,10 +5,10 @@ from database import db, create_all, User as UserModel, Ressources
 from dotenv import load_dotenv
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from sqlalchemy import or_
-from src.constants import ADMINS
 from src.forms import RessourceForm, LoginForm, RegistrationForm
 from flask_bootstrap import Bootstrap5
 import json
+from functools import wraps
 
 load_dotenv()
 
@@ -42,37 +42,46 @@ def unauthorized():
     return redirect(url_for('login'))
 
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = User.query.filter_by(id=current_user.id).first()
+        if not user.admin:
+            flash("You are not an admin.", "error")
+            return redirect(url_for("home"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @app.route("/", methods=["GET", "POST"])
 def home():
-
+    search_query = []
     if request.method == 'POST':
         search_query = [arg.strip().lower() for arg in request.form.get('search').split(",")]
-        search_filters = []
-        for search_arg in search_query:
-            search_filters.append(
-                or_(
-                    Ressources.name.ilike(f"%{search_arg}%"),
-                    Ressources.description.ilike(f"%{search_arg}%"),
-                    Ressources.category.ilike(f"%{search_arg}%"),
-                    Ressources.topic.ilike(f"%{search_arg}%"),
-                    Ressources.tags.ilike(f"%{search_arg}%"),
-                    Ressources.medium.ilike(f"%{search_arg}%"),
-                    Ressources.link.ilike(f"%{search_arg}%"),
-                )
-            )
+        search_filters = [
+            or_(
+                Ressources.name.ilike(f"%{search_arg}%"),
+                Ressources.description.ilike(f"%{search_arg}%"),
+                Ressources.category.ilike(f"%{search_arg}%"),
+                Ressources.topic.ilike(f"%{search_arg}%"),
+                Ressources.tags.ilike(f"%{search_arg}%"),
+                Ressources.medium.ilike(f"%{search_arg}%"),
+                Ressources.link.ilike(f"%{search_arg}%"),
+            ) for search_arg in search_query
+        ]
         ressources = Ressources.query.filter(or_(*search_filters)).all()
-        for ressource in ressources:
-            user = User.query.filter_by(id=ressource.user_id).first()
-            ressource.username = user.username if user else "-"
-        
-        return render_template("index.html", ressources=ressources, search_query=" ".join(search_query))
-        
-    ressources = Ressources.query.all()
+    else:
+        ressources = Ressources.query.all()
+
+    filtered_ressources = []
     for ressource in ressources:
+        if not current_user.is_authenticated and ressource.private:
+            continue
         user = User.query.filter_by(id=ressource.user_id).first()
         ressource.username = user.username if user else "-"
-        
-    return render_template("index.html", ressources=ressources)
+        filtered_ressources.append(ressource)
+
+    return render_template("index.html", ressources=filtered_ressources, search_query=" ".join(search_query))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -80,12 +89,12 @@ def login():
     form = LoginForm()
     
     if form.validate_on_submit():
-        if request.form['email'] not in ADMINS:
-            flash("You are not allowed to login.", "error")
-            return redirect(url_for("home"))
         email = request.form["email"]
         password = request.form["password"]
         user = User.query.filter_by(email=email).first()
+        if not user.admin:
+            flash("You are not an admin.", "error")
+            return redirect(url_for("home"))
         response = requests.post(url=f"{AUTH_URL}/login?email={email}&password={password}")
         if response.status_code == 200:
             flash(response.json()['message'], "success")
@@ -101,18 +110,13 @@ def register():
     form = RegistrationForm()
     
     if form.validate_on_submit():
-        if request.form['email'] not in ADMINS:
-            flash("You are not allowed to register.", "error")
-            return redirect(url_for("home"))
         email = request.form["email"]
         password = request.form["password"]
         username = request.form["username"]
-        response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://filmhub.timonrieger.de/")
+        response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://library.timonrieger.de/")
         if response.status_code == 200:
             flash(response.json()['message'], "success")
-            user = User.query.filter_by(email=email).first()
-            login_user(user)
-            return redirect(url_for("home"))
+            return redirect(url_for("login"))
         flash(response.json()['message'], "error")
         
     return render_template("register.html", form=form)
@@ -127,6 +131,7 @@ def logout():
 
 @app.route("/edit", methods=["GET", "POST"])
 @login_required
+@admin_required
 def edit():
     id = request.args.get("id")
     form = RessourceForm()
@@ -140,6 +145,7 @@ def edit():
         ressource.topic = form.topic.data
         ressource.tags = json.dumps(form.tags.data)
         ressource.description=form.description.data
+        ressource.private = True if form.private.data == "True" else False
         db.session.commit()
         flash("Ressource updated successfully", "success")
         return redirect(url_for("home"))
@@ -152,24 +158,37 @@ def edit():
             category=ressource.category,
             topic=ressource.topic,
             tags=json.loads(ressource.tags),
-            description=ressource.description
+            description=ressource.description,
+            private=ressource.private
         )
     return render_template("add.html", form=form, id=id, edit=True)
 
 
 @app.route("/delete")
 @login_required
+@admin_required
 def delete():
     id = request.args.get("id")
     ressource = Ressources.query.filter_by(id=id).first()
+    form = RessourceForm(
+        name=ressource.name,
+        link=ressource.link,
+        medium=ressource.medium,
+        category=ressource.category,
+        topic=ressource.topic,
+        tags=json.loads(ressource.tags),
+        description=ressource.description,
+        private=ressource.private
+    )
     db.session.delete(ressource)
     db.session.commit()
-    flash("Ressource deleted successfully", "success")
-    return redirect(url_for("home"))
+    flash("Ressource deleted successfully. Accident? Add the ressource again by submitting the form.", "success")
+    return render_template("add.html", form=form)
 
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
+@admin_required
 def add():
     form = RessourceForm()
     
@@ -186,7 +205,8 @@ def add():
                 topic=form.topic.data,
                 tags=json.dumps(form.tags.data),
                 user_id=current_user.id,
-                description=form.description.data
+                description=form.description.data,
+                private=True if form.private.data == "True" else False
             )
             db.session.add(ressource)
             db.session.commit()

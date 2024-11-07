@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, SelectMultipleField
+from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, RadioField
 from wtforms.validators import DataRequired, URL, Length, Optional
 from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TOPIC_CHOICES, TAGS_CHOICES
 
@@ -30,6 +30,10 @@ class RessourceForm(FlaskForm):
         choices=TAGS_CHOICES,
         validators=[Optional()]
     )
+    private = RadioField(
+        "Private?",
+        choices=[(True, "Yes, make it private"), (False, "No, make it public")],
+        validators=[DataRequired()])
     submit = SubmitField(label="Save")
 
 
