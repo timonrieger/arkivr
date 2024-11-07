@@ -5,7 +5,7 @@ from database import db, create_all, User as UserModel, Ressources
 from dotenv import load_dotenv
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
 from sqlalchemy import or_
-from src.forms import RessourceForm, LoginForm, RegistrationForm
+from src.forms import RessourceForm, LoginForm, RegistrationForm, PasswordResetForm
 from flask_bootstrap import Bootstrap5
 import json
 from functools import wraps
@@ -89,8 +89,8 @@ def login():
     form = LoginForm()
     
     if form.validate_on_submit():
-        email = request.form["email"]
-        password = request.form["password"]
+        email = form.email.data
+        password = form.password.data
         user = User.query.filter_by(email=email).first()
         if not user.admin:
             flash("You are not an admin.", "error")
@@ -110,9 +110,9 @@ def register():
     form = RegistrationForm()
     
     if form.validate_on_submit():
-        email = request.form["email"]
-        password = request.form["password"]
-        username = request.form["username"]
+        email = form.email.data
+        password = form.password.data
+        username = form.username.data
         response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://library.timonrieger.de/")
         if response.status_code == 200:
             flash(response.json()['message'], "success")
@@ -120,6 +120,21 @@ def register():
         flash(response.json()['message'], "error")
         
     return render_template("register.html", form=form)
+
+
+@app.route("/reset", methods=["GET", "POST"])
+def reset():
+    form = PasswordResetForm()
+    
+    if form.validate_on_submit():
+        email = form.email.data
+        response = requests.post(url=f"{AUTH_URL}/reset?email={email}&then=https://library.timonrieger.de/")
+        if response.status_code == 200:
+            flash(response.json()['message'], "success")
+            return redirect(url_for("login"))
+        flash(response.json()['message'], "error")
+        
+    return render_template("reset.html", form=form)
 
 
 @app.route("/logout")
