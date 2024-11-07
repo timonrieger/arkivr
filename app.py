@@ -20,9 +20,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
 db.init_app(app)
 AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
-app.jinja_env.filters['zip'] = zip
 
-app.logger.setLevel("INFO")
 
 class User(UserMixin, UserModel):
     pass
@@ -95,7 +93,11 @@ def login():
         if not user.admin:
             flash("You do not have the necessary permissions to login. Admin access is required.", "error")
             return redirect(url_for("home"))
-        response = requests.post(url=f"{AUTH_URL}/login?email={email}&password={password}")
+        data = {
+            "email": email,
+            "password": password
+        }
+        response = requests.post(url=f"{AUTH_URL}/login", json=data)
         if response.status_code == 200:
             flash(response.json()['message'], "success")
             login_user(user)
@@ -113,7 +115,13 @@ def register():
         email = form.email.data
         password = form.password.data
         username = form.username.data
-        response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://library.timonrieger.de/login")
+        data = {
+            "email": email,
+            "password": password,
+            "username": username,
+            "then": "https://library.timonrieger.de/login"
+        }
+        response = requests.post(f"{AUTH_URL}/register", json=data)
         flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
         
     return render_template("register.html", form=form)
@@ -125,7 +133,11 @@ def reset():
     
     if form.validate_on_submit():
         email = form.email.data
-        response = requests.post(url=f"{AUTH_URL}/reset?email={email}&then=https://library.timonrieger.de/login")
+        data = {
+            "email": email,
+            "then": "https://library.timonrieger.de/login"
+        }
+        response = requests.post(url=f"{AUTH_URL}/reset", json=data)
         flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
         
     return render_template("reset.html", form=form)
