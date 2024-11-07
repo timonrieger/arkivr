@@ -47,7 +47,7 @@ def admin_required(f):
     def decorated_function(*args, **kwargs):
         user = User.query.filter_by(id=current_user.id).first()
         if not user.admin:
-            flash("You are not an admin.", "error")
+            flash("You do not have the necessary permissions to complete this request. Admin access is required.", "error")
             return redirect(url_for("home"))
         return f(*args, **kwargs)
     return decorated_function
@@ -93,7 +93,7 @@ def login():
         password = form.password.data
         user = User.query.filter_by(email=email).first()
         if not user.admin:
-            flash("You are not an admin.", "error")
+            flash("You do not have the necessary permissions to login. Admin access is required.", "error")
             return redirect(url_for("home"))
         response = requests.post(url=f"{AUTH_URL}/login?email={email}&password={password}")
         if response.status_code == 200:
