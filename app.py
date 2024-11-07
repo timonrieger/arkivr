@@ -113,11 +113,8 @@ def register():
         email = form.email.data
         password = form.password.data
         username = form.username.data
-        response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://library.timonrieger.de/")
-        if response.status_code == 200:
-            flash(response.json()['message'], "success")
-            return redirect(url_for("login"))
-        flash(response.json()['message'], "error")
+        response = requests.post(url=f"{AUTH_URL}/register?email={email}&password={password}&username={username}&then=https://library.timonrieger.de/login")
+        flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
         
     return render_template("register.html", form=form)
 
@@ -128,11 +125,8 @@ def reset():
     
     if form.validate_on_submit():
         email = form.email.data
-        response = requests.post(url=f"{AUTH_URL}/reset?email={email}&then=https://library.timonrieger.de/")
-        if response.status_code == 200:
-            flash(response.json()['message'], "success")
-            return redirect(url_for("login"))
-        flash(response.json()['message'], "error")
+        response = requests.post(url=f"{AUTH_URL}/reset?email={email}&then=https://library.timonrieger.de/login")
+        flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
         
     return render_template("reset.html", form=form)
 
