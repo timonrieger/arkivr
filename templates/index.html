@@ -3,7 +3,7 @@
   {% include 'components/search.html' %}
   <p>{{ ressources|length }} {%if ressources|length == 1 %}result{% else %}results{% endif %}
     {% if search_query %}
-      for "{{ search_query }}"
+      for "{{ search_query }}" <a href="{{ url_for('home') }}">Clear</a>
     {% endif %}
   </p>
   {% for ressource in ressources %}

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, RadioField
 from wtforms.validators import DataRequired, URL, Length, Optional
-from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TOPIC_CHOICES, TAGS_CHOICES
+from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TAGS_CHOICES
 
 class RessourceForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(max=20)])
@@ -16,12 +16,6 @@ class RessourceForm(FlaskForm):
     category = SelectField(
         "Category", 
         choices=CATEGORY_CHOICES,
-        validators=[DataRequired()]
-    )
-
-    topic = SelectField(
-        "Topic", 
-        choices=TOPIC_CHOICES,
         validators=[DataRequired()]
     )
 

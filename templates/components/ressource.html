@@ -19,10 +19,6 @@
       <p class="text-medium text-md truncate">{{ ressource.category }}</p>
     </div>
     <div>
-      <h2 class="text-sm text-gray-500">Topic</h2>
-      <p class="text-medium text-md truncate">{{ ressource.topic }}</p>
-    </div>
-    <div>
       <h2 class="text-sm text-gray-500">Tags</h2>
       <p class="text-medium text-md truncate">
         {% if ressource.tags=='[]' %} No tags {% else %} {{ ressource.tags |
@@ -97,10 +93,6 @@
   <div class="flex flex-row justify-between items-center">
     <h2 class="text-sm text-gray-500">Category</h2>
     <p class="text-medium text-md truncate">{{ ressource.category }}</p>
-  </div>
-  <div class="flex flex-row justify-between items-center">
-    <h2 class="text-sm text-gray-500">Topic</h2>
-    <p class="text-medium text-md truncate">{{ ressource.topic }}</p>
   </div>
   <div class="flex flex-row justify-between items-center">
     <h2 class="text-sm text-gray-500">Tags</h2>

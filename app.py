@@ -61,7 +61,6 @@ def home():
                 Ressources.name.ilike(f"%{search_arg}%"),
                 Ressources.description.ilike(f"%{search_arg}%"),
                 Ressources.category.ilike(f"%{search_arg}%"),
-                Ressources.topic.ilike(f"%{search_arg}%"),
                 Ressources.tags.ilike(f"%{search_arg}%"),
                 Ressources.medium.ilike(f"%{search_arg}%"),
                 Ressources.link.ilike(f"%{search_arg}%"),
@@ -163,7 +162,6 @@ def edit():
         ressource.link = form.link.data
         ressource.medium = form.medium.data
         ressource.category = form.category.data
-        ressource.topic = form.topic.data
         ressource.tags = json.dumps(form.tags.data)
         ressource.description=form.description.data
         ressource.private = True if form.private.data == "True" else False
@@ -177,7 +175,6 @@ def edit():
             link=ressource.link,
             medium=ressource.medium,
             category=ressource.category,
-            topic=ressource.topic,
             tags=json.loads(ressource.tags),
             description=ressource.description,
             private=ressource.private
@@ -196,7 +193,6 @@ def delete():
         link=ressource.link,
         medium=ressource.medium,
         category=ressource.category,
-        topic=ressource.topic,
         tags=json.loads(ressource.tags),
         description=ressource.description,
         private=ressource.private
@@ -223,7 +219,6 @@ def add():
                 link=form.link.data,
                 medium=form.medium.data,
                 category=form.category.data,
-                topic=form.topic.data,
                 tags=json.dumps(form.tags.data),
                 user_id=current_user.id,
                 description=form.description.data,
