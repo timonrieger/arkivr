@@ -22,7 +22,8 @@ class RessourceForm(FlaskForm):
     tags = SelectMultipleField(
         "Tags", 
         choices=TAGS_CHOICES,
-        validators=[Optional()]
+        validators=[Optional()],
+        render_kw={"style": "height: 300px"}
     )
     private = RadioField(
         "Private?",

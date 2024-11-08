@@ -77,8 +77,8 @@ def home():
         user = User.query.filter_by(id=ressource.user_id).first()
         ressource.username = user.username if user else "-"
         filtered_ressources.append(ressource)
-
-    return render_template("index.html", ressources=filtered_ressources, search_query=" ".join(search_query))
+        
+    return render_template("index.html", ressources=filtered_ressources[::-1], search_query=" ".join(search_query))
 
 
 @app.route("/login", methods=["GET", "POST"])
