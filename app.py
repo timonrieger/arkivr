@@ -7,6 +7,7 @@ from flask_login import UserMixin, login_user, LoginManager, current_user, logou
 from sqlalchemy import or_
 from src.forms import RessourceForm, LoginForm, RegistrationForm, PasswordResetForm
 from flask_bootstrap import Bootstrap5
+from flask_caching import Cache
 import json
 from functools import wraps
 
@@ -20,6 +21,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
 db.init_app(app)
 AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
+cache = Cache(app)
 
 
 class User(UserMixin, UserModel):
@@ -52,6 +54,7 @@ def admin_required(f):
 
 
 @app.route("/", methods=["GET", "POST"])
+@cache.cached(timeout=60 * 60 * 24 * 7 * 52) 
 def home():
     search_query = []
     if request.method == 'POST':
@@ -166,6 +169,7 @@ def edit():
         ressource.description=form.description.data
         ressource.private = True if form.private.data == "True" else False
         db.session.commit()
+        cache.clear()
         flash("Ressource updated successfully", "success")
         return redirect(url_for("home"))
     
@@ -199,6 +203,7 @@ def delete():
     )
     db.session.delete(ressource)
     db.session.commit()
+    cache.clear()
     flash("Ressource deleted successfully. Accident? Add the ressource again by submitting the form.", "success")
     return render_template("add.html", form=form)
 
@@ -226,6 +231,7 @@ def add():
             )
             db.session.add(ressource)
             db.session.commit()
+            cache.clear()
             flash("Ressource added successfully", "success")
             return redirect(url_for("home"))
 
