@@ -21,11 +21,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
 db.init_app(app)
 AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
-config = {
-    "CACHE_TYPE": "SimpleCache",
-    "CACHE_DEFAULT_TIMEOUT": 60 * 60 * 24 * 7 * 52
-}
-cache = Cache(app, config=config)
+cache = Cache(app, config={"CACHE_TYPE": "SimpleCache"})
 
 
 class User(UserMixin, UserModel):
@@ -58,7 +54,6 @@ def admin_required(f):
 
 
 @app.route("/", methods=["GET", "POST"])
-@cache.cached(timeout=60 * 60 * 24 * 7 * 52) 
 def home():
     search_query = []
     if request.method == 'POST':
@@ -75,7 +70,10 @@ def home():
         ]
         ressources = Ressources.query.filter(or_(*search_filters)).all()
     else:
-        ressources = Ressources.query.all()
+        ressources = cache.get('all_ressources')
+        if not ressources:
+            ressources = Ressources.query.all()
+            cache.set('all_ressources', ressources, timeout=60 * 60 * 24 * 7 * 52)
 
     filtered_ressources = []
     for ressource in ressources:
