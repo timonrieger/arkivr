@@ -21,7 +21,11 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
 db.init_app(app)
 AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
-cache = Cache(app)
+config = {
+    "CACHE_TYPE": "SimpleCache",
+    "CACHE_DEFAULT_TIMEOUT": 60 * 60 * 24 * 7 * 52
+}
+cache = Cache(app, config=config)
 
 
 class User(UserMixin, UserModel):
@@ -239,4 +243,4 @@ def add():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
