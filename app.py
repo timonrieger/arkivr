@@ -21,7 +21,8 @@ app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DB_URI")
 db.init_app(app)
 AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
-cache = Cache(app, config={"CACHE_TYPE": "SimpleCache"})
+cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
+cache.init_app(app)
 
 
 class User(UserMixin, UserModel):
@@ -75,12 +76,14 @@ def home():
             ressources = Ressources.query.all()
             cache.set('all_ressources', ressources, timeout=60 * 60 * 24 * 7 * 52)
 
+    user_ids = [ressource.user_id for ressource in ressources]
+    users = User.query.filter(User.id.in_(user_ids)).all()
+    user_dict = {user.id: user.username for user in users}
     filtered_ressources = []
     for ressource in ressources:
         if not current_user.is_authenticated and ressource.private:
             continue
-        user = User.query.filter_by(id=ressource.user_id).first()
-        ressource.username = user.username if user else "-"
+        ressource.username = user_dict.get(ressource.user_id, "-")
         filtered_ressources.append(ressource)
         
     return render_template("index.html", ressources=filtered_ressources[::-1], search_query=" ".join(search_query))
