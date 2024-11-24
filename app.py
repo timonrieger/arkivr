@@ -69,11 +69,11 @@ def home():
                 Ressources.link.ilike(f"%{search_arg}%"),
             ) for search_arg in search_query
         ]
-        ressources = Ressources.query.filter(or_(*search_filters)).all()
+        ressources = Ressources.query.filter(or_(*search_filters)).order_by(Ressources.added.desc()).all()
     else:
         ressources = cache.get('all_ressources')
         if not ressources:
-            ressources = Ressources.query.all()
+            ressources = Ressources.query.order_by(Ressources.added.desc()).all()
             cache.set('all_ressources', ressources, timeout=60 * 60 * 24 * 7 * 52)
 
     user_ids = [ressource.user_id for ressource in ressources]
@@ -85,8 +85,9 @@ def home():
             continue
         ressource.username = user_dict.get(ressource.user_id, "-")
         filtered_ressources.append(ressource)
+
         
-    return render_template("index.html", ressources=filtered_ressources[::-1], search_query=" ".join(search_query))
+    return render_template("index.html", ressources=filtered_ressources, search_query=" ".join(search_query))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -188,7 +189,7 @@ def edit():
             description=ressource.description,
             private=ressource.private
         )
-    return render_template("add.html", form=form, id=id, edit=True)
+    return render_template("add.html", form=form, id=id, edit=True, ressource=ressource.name)
 
 
 @app.route("/delete")
