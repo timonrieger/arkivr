@@ -6,7 +6,7 @@ from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TAGS_CHOICES
 class RessourceForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(max=20)])
     link = StringField("Link", validators=[DataRequired(), URL()])
-    description = StringField("Description", validators=[Optional()])
+    description = StringField("Description", validators=[DataRequired()])
     medium = SelectField(
         "Medium", 
         choices=MEDIUM_CHOICES,

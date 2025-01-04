@@ -1,15 +1,17 @@
-from flask import Flask, render_template, redirect, url_for, request, flash
+from flask import Flask, jsonify, render_template, redirect, url_for, request, flash
 import requests
 import os
 from database import db, create_all, User as UserModel, Ressources
 from dotenv import load_dotenv
 from flask_login import UserMixin, login_user, LoginManager, current_user, logout_user, login_required
-from sqlalchemy import or_
+from src.constants import RESSOURCE_SCHEMA
 from src.forms import RessourceForm, LoginForm, RegistrationForm, PasswordResetForm
 from flask_bootstrap import Bootstrap5
 from flask_caching import Cache
 import json
 from functools import wraps
+from flask_rebar import Rebar
+from src.utils import get_missing_fields, get_ressources
 
 load_dotenv()
 
@@ -23,6 +25,8 @@ AUTH_URL = os.getenv("AUTH_URL")
 bootstrap = Bootstrap5(app)
 cache = Cache(config={"CACHE_TYPE": "SimpleCache"})
 cache.init_app(app)
+rebar = Rebar()
+api_v1_registry = rebar.create_handler_registry(prefix='/api/v1')
 
 
 class User(UserMixin, UserModel):
@@ -53,28 +57,24 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def api_key_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        response = requests.get(url=f"{AUTH_URL}/apikey/verify", headers=request.headers)
+        if response.status_code != 200:
+            return response.json()['message']
+        request.user_id = response.json()['user_id']
+        return f(*args, **kwargs)
+    return decorated_function 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     search_query = []
     if request.method == 'POST':
         search_query = [arg.strip().lower() for arg in request.form.get('search').split(",")]
-        search_filters = [
-            or_(
-                Ressources.name.ilike(f"%{search_arg}%"),
-                Ressources.description.ilike(f"%{search_arg}%"),
-                Ressources.category.ilike(f"%{search_arg}%"),
-                Ressources.tags.ilike(f"%{search_arg}%"),
-                Ressources.medium.ilike(f"%{search_arg}%"),
-                Ressources.link.ilike(f"%{search_arg}%"),
-            ) for search_arg in search_query
-        ]
-        ressources = Ressources.query.filter(or_(*search_filters)).order_by(Ressources.added.desc()).all()
+        ressources = get_ressources(Ressources, filter=search_query)
     else:
-        ressources = cache.get('all_ressources')
-        if not ressources:
-            ressources = Ressources.query.order_by(Ressources.added.desc()).all()
-            cache.set('all_ressources', ressources, timeout=60 * 60 * 24 * 7 * 52)
+        ressources = get_ressources(Ressources, cache=cache)
 
     user_ids = [ressource.user_id for ressource in ressources]
     users = User.query.filter(User.id.in_(user_ids)).all()
@@ -243,6 +243,42 @@ def add():
 
     return render_template("add.html", form=form)
 
+@api_v1_registry.handles(rule="/ressources", method="GET")
+def api_get_ressources():
+    query = [arg.strip().lower() for arg in request.args.get("q").split(",")] if request.args.get("q") else None
+    if query:
+        data = get_ressources(ressource_model=Ressources, filter=query)
+    else:
+        data = get_ressources(ressource_model=Ressources, cache=cache)
+    return [ressource.to_dict() for ressource in data]
+
+@api_v1_registry.handles(rule="/ressources", method="POST")
+@api_key_required
+def api_post_ressource():
+    data = request.get_json()
+    required_fields = RESSOURCE_SCHEMA['required']
+    if not data or get_missing_fields(data, required_fields):
+        return jsonify({'message': f"Missing field(s): {', '.join(get_missing_fields(data, required_fields))}"}), 400
+
+    already_exists = Ressources.query.filter_by(link=data["link"]).first()
+    if already_exists:
+        return jsonify({"error": "Ressource already exists"}), 409
+    ressource = Ressources(
+        name=data["name"],
+        link=data["link"],
+        medium=data.get("medium"),
+        category=data.get("category"),
+        tags=json.dumps(data.get("tags", [])),
+        user_id=request.user_id,
+        description=data.get("description", ""),
+        private=True if data.get("private") == "true" else False
+    )
+    db.session.add(ressource)
+    db.session.commit()
+    cache.clear()
+
+    return jsonify({"message": "Ressource added successfully", "data": ressource.to_dict()}), 201
 
 if __name__ == '__main__':
+    rebar.init_app(app)
     app.run(debug=False)
