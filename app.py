@@ -105,7 +105,7 @@ def login():
             "email": email,
             "password": password
         }
-        response = requests.post(url=f"{AUTH_URL}/login", json=data)
+        response = requests.post(url=f"{AUTH_URL}/api/login", json=data)
         if response.status_code == 200:
             flash(response.json()['message'], "success")
             login_user(user)
@@ -129,26 +129,15 @@ def register():
             "username": username,
             "then": "https://library.timonrieger.de/login"
         }
-        response = requests.post(f"{AUTH_URL}/register", json=data)
+        response = requests.post(f"{AUTH_URL}/api/register", json=data)
         flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
         
     return render_template("register.html", form=form)
 
 
-@app.route("/reset", methods=["GET", "POST"])
-def reset():
-    form = PasswordResetForm()
-    
-    if form.validate_on_submit():
-        email = form.email.data
-        data = {
-            "email": email,
-            "then": "https://library.timonrieger.de/login"
-        }
-        response = requests.post(url=f"{AUTH_URL}/reset", json=data)
-        flash(response.json()['message'], "success") if response.status_code == 200 else flash(response.json()['message'], "error")
-        
-    return render_template("reset.html", form=form)
+@app.route("/account", methods=["GET", "POST"])
+def account():
+    return redirect(f"{AUTH_URL}/app")
 
 
 @app.route("/logout")

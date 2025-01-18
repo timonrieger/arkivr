@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, RadioField
+from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, RadioField, PasswordField, EmailField
 from wtforms.validators import DataRequired, URL, Length, Optional
 from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TAGS_CHOICES
 
@@ -33,19 +33,13 @@ class RessourceForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField(label="Email", validators=[DataRequired()])
-    password = StringField(label="Password", validators=[DataRequired()])
+    email = EmailField(label="Email", validators=[DataRequired()])
+    password = PasswordField(label="Password", validators=[DataRequired()])
     submit = SubmitField(label="Login")
 
 
 class RegistrationForm(FlaskForm):
     username = StringField(label="Username", validators=[DataRequired()])
-    email = StringField(label="Email", validators=[DataRequired()])
-    password = StringField(label="Password", validators=[DataRequired()])
+    email = EmailField(label="Email", validators=[DataRequired()])
+    password = PasswordField(label="Password", validators=[DataRequired()])
     submit = SubmitField(label="Register")
-    
-    
-class PasswordResetForm(FlaskForm):
-    email = StringField(label="Email", validators=[DataRequired()])
-    submit = SubmitField(label="Reset Password")
-    
