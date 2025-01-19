@@ -1,34 +1,38 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField, SelectMultipleField, RadioField, PasswordField, EmailField
+from wtforms import (
+    StringField,
+    SubmitField,
+    SelectField,
+    SelectMultipleField,
+    RadioField,
+    PasswordField,
+    EmailField,
+)
 from wtforms.validators import DataRequired, URL, Length, Optional
 from src.constants import MEDIUM_CHOICES, CATEGORY_CHOICES, TAGS_CHOICES
+
 
 class RessourceForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired(), Length(max=20)])
     link = StringField("Link", validators=[DataRequired(), URL()])
     description = StringField("Description", validators=[DataRequired()])
-    medium = SelectField(
-        "Medium", 
-        choices=MEDIUM_CHOICES,
-        validators=[DataRequired()]
-    )
+    medium = SelectField("Medium", choices=MEDIUM_CHOICES, validators=[DataRequired()])
 
     category = SelectField(
-        "Category", 
-        choices=CATEGORY_CHOICES,
-        validators=[DataRequired()]
+        "Category", choices=CATEGORY_CHOICES, validators=[DataRequired()]
     )
 
     tags = SelectMultipleField(
-        "Tags", 
+        "Tags",
         choices=TAGS_CHOICES,
         validators=[Optional()],
-        render_kw={"style": "height: 300px"}
+        render_kw={"style": "height: 300px"},
     )
     private = RadioField(
         "Private?",
         choices=[(True, "Yes, make it private"), (False, "No, make it public")],
-        validators=[DataRequired()])
+        validators=[DataRequired()],
+    )
     submit = SubmitField(label="Save")
 
 

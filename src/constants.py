@@ -11,4 +11,7 @@ MEDIUM_CHOICES = npoint_data["medium"]
 CATEGORY_CHOICES = npoint_data["category"]
 TAGS_CHOICES = npoint_data["tags"]
 
-RESSOURCE_SCHEMA = {"required": ["name", "link", "description", "category", "medium"], "optional": ["tags", "private"]}
+RESSOURCE_SCHEMA = {
+    "required": ["name", "link", "description", "category", "medium"],
+    "optional": ["tags", "private"],
+}
