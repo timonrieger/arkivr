@@ -1,16 +1,62 @@
-import json
-import requests
 import dotenv
-import os
 
 dotenv.load_dotenv()
 
-with open(os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'static', 'data', 'data.json'), 'r') as f:
-    data = json.load(f)
+MEDIUM_CHOICES = [
+    "Website",
+    "Video",
+    "Repository",
+    "Tool",
+    "Documentation",
+    "Article",
+    "Paper",
+]
 
-MEDIUM_CHOICES = data["medium"]
-CATEGORY_CHOICES = data["category"]
-TAGS_CHOICES = data["tags"]
+CATEGORY_CHOICES = [
+    "Education",
+    "Code",
+    "Data Science",
+    "Security",
+    "Crypto",
+    "Design",
+    "Research",
+    "Finance",
+    "Productivity",
+    "Data",
+    "Politics",
+    "Utility",
+]
+
+TAGS_CHOICES = [
+    "Framework",
+    "Language",
+    "Algorithms",
+    "Containerization",
+    "Visualization",
+    "Authentication",
+    "Blockchain",
+    "DeFi",
+    "CI/CD",
+    "Virtualization",
+    "Cloud",
+    "Server",
+    "Testing",
+    "Frontend",
+    "Search",
+    "Design",
+    "Backend",
+    "Data Analysis",
+    "AI",
+    "Charting",
+    "Version Control",
+    "API",
+    "Maths",
+    "Analytics",
+    "Open Source",
+    "Communication",
+    "IoT",
+    "Payments",
+]
 
 RESSOURCE_SCHEMA = {
     "required": ["name", "link", "description", "category", "medium"],
