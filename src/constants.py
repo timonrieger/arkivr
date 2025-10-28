@@ -1,15 +1,16 @@
+import json
 import requests
 import dotenv
 import os
 
 dotenv.load_dotenv()
 
-NPOINT = os.getenv("NPOINT")
-npoint_data = requests.get(url=NPOINT).json()
+with open("static/data/data.json", "r") as f:
+    data = json.load(f)
 
-MEDIUM_CHOICES = npoint_data["medium"]
-CATEGORY_CHOICES = npoint_data["category"]
-TAGS_CHOICES = npoint_data["tags"]
+MEDIUM_CHOICES = data["medium"]
+CATEGORY_CHOICES = data["category"]
+TAGS_CHOICES = data["tags"]
 
 RESSOURCE_SCHEMA = {
     "required": ["name", "link", "description", "category", "medium"],
